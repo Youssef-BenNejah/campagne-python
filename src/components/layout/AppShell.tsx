@@ -24,6 +24,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         </Link>
         {session ? (
           <div className="flex items-center gap-5">
+            <Link to="/journal" className="font-mono text-xs text-olive-400 hover:text-paper-200">
+              journal
+            </Link>
             <XPBar xp={xp} />
             <RankBadge xp={xp} />
             <button

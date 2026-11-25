@@ -4,8 +4,10 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Battle } from "./pages/Battle";
 import { CampaignMap } from "./pages/CampaignMap";
 import { Course } from "./pages/Course";
+import { Journal } from "./pages/Journal";
 import { Login } from "./pages/Login";
 import { TopicDetail } from "./pages/TopicDetail";
+import { WarBattle } from "./pages/WarBattle";
 
 export default function App() {
   return (
@@ -17,6 +19,22 @@ export default function App() {
           element={
             <ProtectedRoute>
               <CampaignMap />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/journal"
+          element={
+            <ProtectedRoute>
+              <Journal />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/guerre/:warId"
+          element={
+            <ProtectedRoute>
+              <WarBattle />
             </ProtectedRoute>
           }
         />
