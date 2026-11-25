@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@theme {
+  /* Bunker — the base dark surface the whole app sits on (not pure black) */
+  --color-bunker-950: #12170f;
+  --color-bunker-900: #181f14;
+  --color-bunker-800: #202a1b;
+  --color-bunker-700: #2c3824;
+
+  /* Paper — dossier / mission-brief surfaces, used sparingly, never as the app bg */
+  --color-paper-100: #f1ead4;
+  --color-paper-200: #e8e1cf;
+  --color-paper-300: #d8cfb3;
+  --color-paper-ink: #2a2415;
+
+  /* Brass — the single spent accent: rank, XP, active state */
+  --color-brass-300: #d9ab5c;
+  --color-brass-400: #c6953f;
+  --color-brass-500: #b8863b;
+  --color-brass-600: #96692a;
+
+  /* Olive — contour lines, borders, secondary structure */
+  --color-olive-400: #6b7a5e;
+  --color-olive-500: #4a5d45;
+  --color-olive-600: #3a4a37;
+
+  /* Signal colors — reserved for verdicts only, never decoration */
+  --color-signal-success: #6b8f5e;
+  --color-signal-success-strong: #8fb87d;
+  --color-signal-danger: #a8432f;
+  --color-signal-danger-strong: #d2694f;
+
+  --font-display: "Oswald", sans-serif;
+  --font-body: "IBM Plex Sans", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-bunker-950);
+    color: var(--color-paper-200);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brass-400);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Faint topographic contour texture for map / bunker surfaces */
+.bg-contour {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--color-olive-500) 10%, transparent) 0px,
+      transparent 1px,
+      transparent 28px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-olive-500) 10%, transparent) 0px,
+      transparent 1px,
+      transparent 28px
+    );
+}
