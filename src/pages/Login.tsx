@@ -12,7 +12,10 @@ export function Login() {
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setStatus("sending");
-    const { error } = await supabase.auth.signInWithOtp({ email });
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: window.location.origin },
+    });
     if (error) {
       setStatus("error");
       setErrorMessage(error.message);
