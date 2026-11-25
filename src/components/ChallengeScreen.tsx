@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ReactDiffViewer from "react-diff-viewer-continued";
 import { Link } from "react-router-dom";
 import type { Exercise } from "../data/exercises";
@@ -13,6 +13,18 @@ import { DossierPanel } from "./DossierPanel";
 import { HintsPanel } from "./HintsPanel";
 import { TracePanel } from "./TracePanel";
 import { VerdictStamp } from "./VerdictStamp";
+
+const EXAM_DURATION_SECONDS: Record<Exercise["difficulty"], number> = {
+  1: 8 * 60,
+  2: 12 * 60,
+  3: 18 * 60,
+};
+
+function formatClock(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
 
 /**
  * Shared by a topic battle (/secteur/:topicId/:exerciseId) and a war
@@ -34,6 +46,9 @@ export function ChallengeScreen({
   const [report, setReport] = useState<GradeReport | null>(null);
   const [xpAwarded, setXpAwarded] = useState<number | null>(null);
   const [status, setStatus] = useState<"idle" | "running">("idle");
+  const [examMode, setExamMode] = useState(false);
+  const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
+  const autoSubmittedRef = useRef(false);
   const cheat = useCheatWatch(true);
   const { session } = useAuth();
   const { refresh } = useProgress();
@@ -42,14 +57,18 @@ export function ChallengeScreen({
     setCode(exercise.starterCode);
     setReport(null);
     setXpAwarded(null);
+    setExamMode(false);
+    setRemainingSeconds(null);
+    autoSubmittedRef.current = false;
     cheat.reset();
     // Deliberately only re-runs when the challenge identity changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exercise.id]);
 
-  const penalty = cheat.flags.reduce((sum, flag) => sum + CHEAT_PENALTY[flag.kind], 0);
+  const basePenalty = cheat.flags.reduce((sum, flag) => sum + CHEAT_PENALTY[flag.kind], 0);
+  const penalty = examMode ? basePenalty * 2 : basePenalty;
 
-  async function handleSubmit() {
+  const handleSubmit = useCallback(async () => {
     setStatus("running");
     try {
       const result = await gradeSubmission(exercise, code);
@@ -71,6 +90,7 @@ export function ChallengeScreen({
           total_count: result.totalCount,
           xp_awarded: xp,
           cheat_flags: cheat.flags,
+          exam_mode: examMode,
         });
         if (error) {
           console.error("Impossible d'enregistrer la soumission :", error.message);
@@ -81,6 +101,33 @@ export function ChallengeScreen({
     } finally {
       setStatus("idle");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exercise, code, session, penalty, examMode, submissionTopicId]);
+
+  const handleSubmitRef = useRef(handleSubmit);
+  handleSubmitRef.current = handleSubmit;
+
+  useEffect(() => {
+    if (remainingSeconds === null) return;
+    const interval = setInterval(() => {
+      setRemainingSeconds((prev) => {
+        if (prev === null) return prev;
+        if (prev <= 1) {
+          if (!autoSubmittedRef.current) {
+            autoSubmittedRef.current = true;
+            handleSubmitRef.current();
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [remainingSeconds !== null]);
+
+  function startExam() {
+    setExamMode(true);
+    setRemainingSeconds(EXAM_DURATION_SECONDS[exercise.difficulty]);
   }
 
   return (
@@ -89,12 +136,31 @@ export function ChallengeScreen({
         <Link to={backTo} className="font-mono text-xs text-olive-400 hover:text-paper-200">
           ← {backLabel}
         </Link>
-        {cheat.flags.length > 0 && (
-          <p role="status" className="font-mono text-xs text-signal-danger-strong">
-            {cheat.flags.length} signalement{cheat.flags.length > 1 ? "s" : ""} (−{penalty} pts)
-          </p>
-        )}
+        <div className="flex items-center gap-3">
+          {examMode && remainingSeconds !== null && (
+            <span
+              role="timer"
+              className={
+                "font-mono text-sm " +
+                (remainingSeconds < 60 ? "text-signal-danger-strong" : "text-brass-400")
+              }
+            >
+              ⏱ {formatClock(remainingSeconds)}
+            </span>
+          )}
+          {cheat.flags.length > 0 && (
+            <p role="status" className="font-mono text-xs text-signal-danger-strong">
+              {cheat.flags.length} signalement{cheat.flags.length > 1 ? "s" : ""} (−{penalty} pts)
+            </p>
+          )}
+        </div>
       </div>
+
+      {examMode && (
+        <p role="status" className="border border-brass-600 bg-brass-500/10 px-3 py-2 font-mono text-xs text-brass-300">
+          Mode examen actif : pas d'indice, pénalités doublées, soumission automatique à 0:00.
+        </p>
+      )}
 
       <div className="grid gap-0 border border-olive-600 lg:grid-cols-2">
         <DossierPanel label={`Difficulté ${exercise.difficulty}/3`} title={exercise.title}>
@@ -116,15 +182,16 @@ export function ChallengeScreen({
             value={code}
             onChange={setCode}
             onPaste={cheat.reportPaste}
+            readOnly={examMode && report !== null}
           />
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={status === "running"}
+          disabled={status === "running" || (examMode && report !== null)}
           className="bg-brass-500 px-4 py-2 font-display text-sm font-medium tracking-wide text-bunker-950 transition-colors hover:bg-brass-400 disabled:opacity-50"
         >
           {status === "running" ? "Exécution…" : "Lancer la mission"}
@@ -134,13 +201,23 @@ export function ChallengeScreen({
             Démarrage de l'interpréteur Python…
           </span>
         )}
+        {!examMode && !report && (
+          <button
+            type="button"
+            onClick={startExam}
+            className="ml-auto border border-olive-500 px-3 py-1.5 font-mono text-xs text-olive-400 hover:border-brass-500 hover:text-brass-400"
+          >
+            Activer le mode examen ({Math.round(EXAM_DURATION_SECONDS[exercise.difficulty] / 60)}{" "}
+            min, sans indice, pénalités ×2)
+          </button>
+        )}
       </div>
 
       {report && (
         <AfterActionReport report={report} xpAwarded={xpAwarded} exercise={exercise} code={code} />
       )}
 
-      <HintsPanel exercise={exercise} code={code} />
+      {!examMode && <HintsPanel exercise={exercise} code={code} />}
     </div>
   );
 }

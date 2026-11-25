@@ -27,6 +27,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Link to="/journal" className="font-mono text-xs text-olive-400 hover:text-paper-200">
               journal
             </Link>
+            <Link to="/mentor" className="font-mono text-xs text-olive-400 hover:text-paper-200">
+              mentor
+            </Link>
             <XPBar xp={xp} />
             <RankBadge xp={xp} />
             <button

@@ -6,6 +6,7 @@ import { CampaignMap } from "./pages/CampaignMap";
 import { Course } from "./pages/Course";
 import { Journal } from "./pages/Journal";
 import { Login } from "./pages/Login";
+import { Mentor } from "./pages/Mentor";
 import { TopicDetail } from "./pages/TopicDetail";
 import { WarBattle } from "./pages/WarBattle";
 
@@ -27,6 +28,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Journal />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/mentor"
+          element={
+            <ProtectedRoute>
+              <Mentor />
             </ProtectedRoute>
           }
         />

@@ -7,11 +7,13 @@ export function CodeEditor({
   onChange,
   onPaste,
   label,
+  readOnly,
 }: {
   value: string;
   onChange: (value: string) => void;
   onPaste: () => void;
   label: string;
+  readOnly?: boolean;
 }) {
   return (
     <div className="flex h-full flex-col bg-bunker-900">
@@ -29,6 +31,7 @@ export function CodeEditor({
           extensions={[python()]}
           basicSetup={{ tabSize: 4 }}
           height="100%"
+          editable={!readOnly}
           style={{ height: "100%", fontSize: "14px" }}
           aria-label={label}
         />
