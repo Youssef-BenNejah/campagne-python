@@ -1,4 +1,5 @@
 import { SectorCard } from "../components/SectorCard";
+import { getExercisesForTopic } from "../data/exercises";
 import { topics } from "../data/topics";
 import { useProgress } from "../lib/useProgress";
 
@@ -20,7 +21,12 @@ export function CampaignMap() {
         ) : (
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {topics.map((topic) => (
-              <SectorCard key={topic.id} topic={topic} cleared={clearedByTopic[topic.id] ?? 0} />
+              <SectorCard
+                key={topic.id}
+                topic={topic}
+                cleared={clearedByTopic[topic.id] ?? 0}
+                total={getExercisesForTopic(topic.id).length}
+              />
             ))}
           </div>
         )}

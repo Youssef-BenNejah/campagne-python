@@ -1,8 +1,16 @@
 import { Link } from "react-router-dom";
 import type { Topic } from "../data/topics";
 
-export function SectorCard({ topic, cleared }: { topic: Topic; cleared: number }) {
-  const complete = cleared >= topic.totalOutposts;
+export function SectorCard({
+  topic,
+  cleared,
+  total,
+}: {
+  topic: Topic;
+  cleared: number;
+  total: number;
+}) {
+  const complete = total > 0 && cleared >= total;
 
   return (
     <Link
@@ -12,7 +20,7 @@ export function SectorCard({ topic, cleared }: { topic: Topic; cleared: number }
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-mono text-[11px] text-olive-400">
-            {cleared}/{topic.totalOutposts} avant-postes
+            {cleared}/{total} avant-postes
           </p>
           <h3 className="mt-1 font-display text-lg font-medium text-paper-100">
             {topic.name}
@@ -28,7 +36,7 @@ export function SectorCard({ topic, cleared }: { topic: Topic; cleared: number }
       <div className="mt-3 h-1 w-full bg-bunker-800">
         <div
           className="h-full bg-olive-400 group-hover:bg-brass-500"
-          style={{ width: `${Math.min(100, (cleared / topic.totalOutposts) * 100)}%` }}
+          style={{ width: `${total > 0 ? Math.min(100, (cleared / total) * 100) : 0}%` }}
         />
       </div>
     </Link>

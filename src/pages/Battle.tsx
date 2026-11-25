@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReactDiffViewer from "react-diff-viewer-continued";
+import { Link, Navigate, useParams } from "react-router-dom";
 import { CodeEditor } from "../components/CodeEditor";
 import { DossierPanel } from "../components/DossierPanel";
 import { VerdictStamp } from "../components/VerdictStamp";
-import { sampleExercise } from "../data/sampleExercise";
+import { getExercise } from "../data/exercises";
+import { topics } from "../data/topics";
 import { gradeSubmission, type GradeReport } from "../lib/grade";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/useAuth";
@@ -11,10 +13,12 @@ import { CHEAT_PENALTY, useCheatWatch } from "../lib/useCheatWatch";
 import { useProgress } from "../lib/useProgress";
 import { computeXpAwarded } from "../lib/xp";
 
-const exercise = sampleExercise;
-
 export function Battle() {
-  const [code, setCode] = useState(exercise.starterCode);
+  const { topicId, exerciseId } = useParams<{ topicId: string; exerciseId: string }>();
+  const topic = topics.find((t) => t.id === topicId);
+  const exercise = topicId && exerciseId ? getExercise(topicId, exerciseId) : undefined;
+
+  const [code, setCode] = useState(exercise?.starterCode ?? "");
   const [report, setReport] = useState<GradeReport | null>(null);
   const [xpAwarded, setXpAwarded] = useState<number | null>(null);
   const [status, setStatus] = useState<"idle" | "running">("idle");
@@ -22,9 +26,22 @@ export function Battle() {
   const { session } = useAuth();
   const { refresh } = useProgress();
 
+  useEffect(() => {
+    setCode(exercise?.starterCode ?? "");
+    setReport(null);
+    setXpAwarded(null);
+    cheat.reset();
+    // Deliberately only re-runs when the exercise identity changes.
+  }, [exercise?.id]);
+
+  if (!topic || !exercise) {
+    return <Navigate to="/" replace />;
+  }
+
   const penalty = cheat.flags.reduce((sum, flag) => sum + CHEAT_PENALTY[flag.kind], 0);
 
   async function handleSubmit() {
+    if (!exercise) return;
     setStatus("running");
     try {
       const result = await gradeSubmission(exercise, code);
@@ -60,15 +77,15 @@ export function Battle() {
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-6">
-      <div className="flex items-center justify-between">
-        <p className="font-mono text-xs text-olive-400">
-          Secteur « {exercise.topicId} » — avant-poste
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Link
+          to={`/secteur/${topic.id}`}
+          className="font-mono text-xs text-olive-400 hover:text-paper-200"
+        >
+          ← secteur « {topic.name} »
+        </Link>
         {cheat.flags.length > 0 && (
-          <p
-            role="status"
-            className="font-mono text-xs text-signal-danger-strong"
-          >
+          <p role="status" className="font-mono text-xs text-signal-danger-strong">
             {cheat.flags.length} signalement{cheat.flags.length > 1 ? "s" : ""} (−{penalty} pts)
           </p>
         )}

@@ -2,87 +2,73 @@ export type Difficulty = 1 | 2 | 3;
 
 export interface Topic {
   id: string;
-  /** Matches a file in base_connaissance/, for traceability back to source material. */
+  /** Matches a file in base_connaissance/, for traceability back to source material and the course page. */
   source: string;
   name: string;
   summary: string;
-  totalOutposts: number;
 }
 
-/**
- * Sectors on the campaign map. One per topic file in base_connaissance/.
- * totalOutposts is a placeholder count until the real exercise bank (Phase 2) lands.
- */
+/** Sectors on the campaign map. One per topic file in base_connaissance/. */
 export const topics: Topic[] = [
   {
     id: "tri",
     source: "01_tri.md",
     name: "Tri",
     summary: "Tri à bulle, tri par sélection, tri de tableaux parallèles.",
-    totalOutposts: 7,
   },
   {
     id: "recherche",
     source: "02_recherche.md",
     name: "Recherche",
     summary: "Recherche séquentielle et recherche dichotomique.",
-    totalOutposts: 4,
   },
   {
     id: "calcul-arithmetique",
     source: "03_calcul_arithmetique.md",
     name: "Calcul arithmétique",
     summary: "PGCD, PPCM, nombres premiers, factorielle.",
-    totalOutposts: 5,
   },
   {
     id: "enregistrements",
     source: "04_enregistrements.md",
     name: "Enregistrements",
     summary: "Types enregistrement, vecteurs d'enregistrements.",
-    totalOutposts: 6,
   },
   {
     id: "analyse-modulaire",
     source: "05_analyse_modulaire.md",
     name: "Analyse modulaire",
     summary: "Décomposition en modules, diviseurs, permutations.",
-    totalOutposts: 6,
   },
   {
     id: "optimisation",
     source: "06_optimisation.md",
     name: "Optimisation",
     summary: "Max/min par balayage, surfaces et volumes optimaux.",
-    totalOutposts: 6,
   },
   {
     id: "approximation",
     source: "07_approximation.md",
     name: "Approximation",
     summary: "Approximations de π, e, φ, √N.",
-    totalOutposts: 4,
   },
   {
     id: "tableaux-2d",
     source: "09_tableaux_2d.md",
     name: "Tableaux 2D",
     summary: "Matrices : parcours, diagonales, Pascal, palindromes.",
-    totalOutposts: 14,
   },
   {
     id: "proprietes-numeriques",
     source: "10_corrections_proprietes_numeriques.md",
     name: "Propriétés numériques",
     summary: "Nombres parfaits, oblongs, porte-bonheur, k-pp.",
-    totalOutposts: 8,
   },
   {
     id: "enregistrements-serie",
     source: "11_enregistrements_serie.md",
     name: "Enregistrements — série",
     summary: "ELEVE, JOUEUR, CLIENT, ADHERENT.",
-    totalOutposts: 5,
   },
 ];
 
