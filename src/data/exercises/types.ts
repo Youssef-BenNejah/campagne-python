@@ -20,6 +20,8 @@ export interface Exercise {
   sourceNote: string;
   /** Looser float comparison for approximation exercises; default 1e-9. */
   tolerance?: number;
+  /** False only for pure-formula exercises; used for the "as-tu pensé à une boucle ?" nudge. */
+  expectsLoop?: boolean;
   /** Worked example(s) straight from the course material. */
   fixedCases: TestCase[];
   /** Produces fresh valid arguments respecting the stated constraints — this

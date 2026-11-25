@@ -3,8 +3,10 @@ import ReactDiffViewer from "react-diff-viewer-continued";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { CodeEditor } from "../components/CodeEditor";
 import { DossierPanel } from "../components/DossierPanel";
+import { HintsPanel } from "../components/HintsPanel";
+import { TracePanel } from "../components/TracePanel";
 import { VerdictStamp } from "../components/VerdictStamp";
-import { getExercise } from "../data/exercises";
+import { getExercise, type Exercise } from "../data/exercises";
 import { topics } from "../data/topics";
 import { gradeSubmission, type GradeReport } from "../lib/grade";
 import { supabase } from "../lib/supabaseClient";
@@ -131,7 +133,11 @@ export function Battle() {
         )}
       </div>
 
-      {report && <AfterActionReport report={report} xpAwarded={xpAwarded} />}
+      {report && (
+        <AfterActionReport report={report} xpAwarded={xpAwarded} exercise={exercise} code={code} />
+      )}
+
+      <HintsPanel exercise={exercise} code={code} />
     </div>
   );
 }
@@ -139,9 +145,13 @@ export function Battle() {
 function AfterActionReport({
   report,
   xpAwarded,
+  exercise,
+  code,
 }: {
   report: GradeReport;
   xpAwarded: number | null;
+  exercise: Exercise;
+  code: string;
 }) {
   if (report.compileError) {
     return (
@@ -196,6 +206,14 @@ function AfterActionReport({
               rightTitle="Ta sortie"
               useDarkTheme
               splitView
+            />
+          </div>
+          <div className="mt-3">
+            <TracePanel
+              code={code}
+              functionName={exercise.functionName}
+              args={firstFailure.args}
+              caseLabel={firstFailure.description}
             />
           </div>
         </div>

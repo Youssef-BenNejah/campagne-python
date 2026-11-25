@@ -76,6 +76,7 @@ export const optimisationExercises: Exercise[] = [
       "Un rectangle de largeur x est inscrit dans un cercle de rayon r " +
       "(y = √(4r² - x²)). Écris la fonction perimetre(x, r) qui renvoie le " +
       "périmètre du rectangle, 2·(x + y).",
+    expectsLoop: false,
     constraints: ["r > 0", "0 < x < 2r"],
     example: { input: "x = 2, r = 2", output: "≈ 10.93" },
     functionName: "perimetre",

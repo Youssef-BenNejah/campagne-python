@@ -12,6 +12,7 @@ export const enregistrementsExercises: Exercise[] = [
       "Un rectangle est représenté par un enregistrement (dictionnaire Python) avec " +
       'les champs "longueur" et "largeur". Écris la fonction surface(rectangle) ' +
       "qui renvoie son aire.",
+    expectsLoop: false,
     constraints: ["0 < longueur ≤ 500", "0 < largeur ≤ 500"],
     example: {
       input: 'rectangle = {"longueur": 5, "largeur": 3}',
@@ -41,6 +42,7 @@ export const enregistrementsExercises: Exercise[] = [
     briefing:
       "Même enregistrement rectangle (champs \"longueur\" et \"largeur\"). " +
       "Écris la fonction perimetre(rectangle) qui renvoie son périmètre.",
+    expectsLoop: false,
     constraints: ["0 < longueur ≤ 500", "0 < largeur ≤ 500"],
     example: { input: 'rectangle = {"longueur": 5, "largeur": 3}', output: "16" },
     functionName: "perimetre",

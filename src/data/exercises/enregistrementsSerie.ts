@@ -12,6 +12,7 @@ export const enregistrementsSerieExercises: Exercise[] = [
       "Un joueur est représenté par un dictionnaire avec les champs \"nom\" et " +
       '"score". Écris la fonction gagnant(j1, j2) qui renvoie le nom du joueur ' +
       "ayant le score le plus élevé (j1 en cas d'égalité).",
+    expectsLoop: false,
     constraints: ["0 ≤ score ≤ 1000"],
     example: {
       input: 'j1 = {"nom": "Ali", "score": 12}\nj2 = {"nom": "Omar", "score": 18}',
@@ -103,6 +104,7 @@ export const enregistrementsSerieExercises: Exercise[] = [
       "mois_actuel) qui renvoie le nombre d'heures offertes : l'ancienneté en " +
       "mois si elle dépasse 60 mois (5 ans), 0 sinon. Ancienneté = " +
       "(annee_actuelle - annee)×12 + (mois_actuel - mois).",
+    expectsLoop: false,
     constraints: ["2000 ≤ annee ≤ annee_actuelle", "1 ≤ mois, mois_actuel ≤ 12"],
     example: {
       input: 'adherent = {"annee": 2015, "mois": 1}, annee_actuelle = 2021, mois_actuel = 3',
