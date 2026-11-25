@@ -1,12 +1,15 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
+import { supabase } from "../../lib/supabaseClient";
+import { useAuth } from "../../lib/useAuth";
+import { useProgress } from "../../lib/useProgress";
 import { RankBadge } from "../RankBadge";
 import { XPBar } from "../XPBar";
 
-/** Placeholder until Phase 1 wires real auth + persisted progress from Supabase. */
-const DEMO_XP = 640;
-
 export function AppShell({ children }: { children: ReactNode }) {
+  const { session } = useAuth();
+  const { xp } = useProgress();
+
   return (
     <div className="flex min-h-screen flex-col">
       <a
@@ -19,10 +22,23 @@ export function AppShell({ children }: { children: ReactNode }) {
         <Link to="/" className="font-display text-lg font-semibold tracking-wide text-paper-100">
           Campagne Python
         </Link>
-        <div className="flex items-center gap-5">
-          <XPBar xp={DEMO_XP} />
-          <RankBadge xp={DEMO_XP} />
-        </div>
+        {session ? (
+          <div className="flex items-center gap-5">
+            <XPBar xp={xp} />
+            <RankBadge xp={xp} />
+            <button
+              type="button"
+              onClick={() => supabase.auth.signOut()}
+              className="font-mono text-xs text-olive-400 underline-offset-2 hover:text-paper-200 hover:underline"
+            >
+              se déconnecter
+            </button>
+          </div>
+        ) : (
+          <Link to="/connexion" className="font-mono text-xs text-brass-400 hover:text-brass-300">
+            se connecter
+          </Link>
+        )}
       </header>
       <main id="main" className="flex-1 bg-bunker-950">
         {children}

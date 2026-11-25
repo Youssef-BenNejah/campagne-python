@@ -5,15 +5,22 @@ import { DossierPanel } from "../components/DossierPanel";
 import { VerdictStamp } from "../components/VerdictStamp";
 import { sampleExercise } from "../data/sampleExercise";
 import { gradeSubmission, type GradeReport } from "../lib/grade";
+import { supabase } from "../lib/supabaseClient";
+import { useAuth } from "../lib/useAuth";
 import { CHEAT_PENALTY, useCheatWatch } from "../lib/useCheatWatch";
+import { useProgress } from "../lib/useProgress";
+import { computeXpAwarded } from "../lib/xp";
 
 const exercise = sampleExercise;
 
 export function Battle() {
   const [code, setCode] = useState(exercise.starterCode);
   const [report, setReport] = useState<GradeReport | null>(null);
+  const [xpAwarded, setXpAwarded] = useState<number | null>(null);
   const [status, setStatus] = useState<"idle" | "running">("idle");
   const cheat = useCheatWatch(true);
+  const { session } = useAuth();
+  const { refresh } = useProgress();
 
   const penalty = cheat.flags.reduce((sum, flag) => sum + CHEAT_PENALTY[flag.kind], 0);
 
@@ -22,6 +29,30 @@ export function Battle() {
     try {
       const result = await gradeSubmission(exercise, code);
       setReport(result);
+
+      const allPassed = !result.compileError && result.passedCount === result.totalCount;
+      const xp = computeXpAwarded(exercise.difficulty, allPassed, penalty);
+      setXpAwarded(xp);
+
+      if (session) {
+        const { error } = await supabase.from("submissions").insert({
+          user_id: session.user.id,
+          exercise_id: exercise.id,
+          topic_id: exercise.topicId,
+          difficulty: exercise.difficulty,
+          code,
+          passed: allPassed,
+          passed_count: result.passedCount,
+          total_count: result.totalCount,
+          xp_awarded: xp,
+          cheat_flags: cheat.flags,
+        });
+        if (error) {
+          console.error("Impossible d'enregistrer la soumission :", error.message);
+        } else {
+          refresh();
+        }
+      }
     } finally {
       setStatus("idle");
     }
@@ -83,12 +114,18 @@ export function Battle() {
         )}
       </div>
 
-      {report && <AfterActionReport report={report} />}
+      {report && <AfterActionReport report={report} xpAwarded={xpAwarded} />}
     </div>
   );
 }
 
-function AfterActionReport({ report }: { report: GradeReport }) {
+function AfterActionReport({
+  report,
+  xpAwarded,
+}: {
+  report: GradeReport;
+  xpAwarded: number | null;
+}) {
   if (report.compileError) {
     return (
       <div role="alert" className="border-2 border-signal-danger-strong bg-bunker-900 p-4">
@@ -107,11 +144,16 @@ function AfterActionReport({ report }: { report: GradeReport }) {
 
   return (
     <div className="space-y-4 border border-olive-600 bg-bunker-900 p-4">
-      <VerdictStamp
-        passed={allPassed}
-        passedCount={report.passedCount}
-        totalCount={report.totalCount}
-      />
+      <div className="flex flex-wrap items-center gap-3">
+        <VerdictStamp
+          passed={allPassed}
+          passedCount={report.passedCount}
+          totalCount={report.totalCount}
+        />
+        {allPassed && xpAwarded !== null && (
+          <span className="font-mono text-sm text-brass-400">+{xpAwarded} XP</span>
+        )}
+      </div>
 
       <ul className="space-y-1.5 font-mono text-xs">
         {report.results.map((r) => (
