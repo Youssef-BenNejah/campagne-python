@@ -15,7 +15,7 @@ export function DossierPanel({
   children: ReactNode;
 }) {
   return (
-    <section className="bg-paper-200 text-paper-ink">
+    <section className="min-w-0 bg-paper-200 text-paper-ink">
       <header className="flex items-baseline justify-between border-b border-paper-300 px-5 py-3">
         <span className="font-mono text-[11px] text-paper-ink/60">{label}</span>
       </header>

@@ -16,12 +16,21 @@ export function TracePanel({
 }) {
   const [trace, setTrace] = useState<TraceResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   async function runTrace() {
     setLoading(true);
-    const result = await traceFunction(code, functionName, args);
-    setTrace(result);
-    setLoading(false);
+    setLoadError(null);
+    try {
+      const result = await traceFunction(code, functionName, args);
+      setTrace(result);
+    } catch (err) {
+      setLoadError(
+        err instanceof Error ? err.message : "Impossible de lancer l'interpréteur Python.",
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -39,6 +48,12 @@ export function TracePanel({
           {loading ? "Exécution…" : trace ? "Relancer" : "Voir le déroulé"}
         </button>
       </div>
+
+      {loadError && (
+        <p role="alert" className="mt-3 font-mono text-xs text-signal-danger-strong">
+          {loadError}
+        </p>
+      )}
 
       {trace && (
         <div className="mt-3">

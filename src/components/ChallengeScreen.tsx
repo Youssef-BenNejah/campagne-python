@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import ReactDiffViewer from "react-diff-viewer-continued";
 import { Link } from "react-router-dom";
 import type { Exercise } from "../data/exercises";
+import { diffViewerStyles } from "../lib/diffViewerTheme";
 import { gradeSubmission, type GradeReport } from "../lib/grade";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/useAuth";
@@ -46,6 +47,7 @@ export function ChallengeScreen({
   const [report, setReport] = useState<GradeReport | null>(null);
   const [xpAwarded, setXpAwarded] = useState<number | null>(null);
   const [status, setStatus] = useState<"idle" | "running">("idle");
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [examMode, setExamMode] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
   const autoSubmittedRef = useRef(false);
@@ -57,6 +59,7 @@ export function ChallengeScreen({
     setCode(exercise.starterCode);
     setReport(null);
     setXpAwarded(null);
+    setLoadError(null);
     setExamMode(false);
     setRemainingSeconds(null);
     autoSubmittedRef.current = false;
@@ -70,6 +73,7 @@ export function ChallengeScreen({
 
   const handleSubmit = useCallback(async () => {
     setStatus("running");
+    setLoadError(null);
     try {
       const result = await gradeSubmission(exercise, code);
       setReport(result);
@@ -98,6 +102,12 @@ export function ChallengeScreen({
           refresh();
         }
       }
+    } catch (err) {
+      setLoadError(
+        err instanceof Error
+          ? err.message
+          : "Impossible de lancer l'interpréteur Python. Vérifie ta connexion et réessaie.",
+      );
     } finally {
       setStatus("idle");
     }
@@ -162,7 +172,7 @@ export function ChallengeScreen({
         </p>
       )}
 
-      <div className="grid gap-0 border border-olive-600 lg:grid-cols-2">
+      <div className="grid min-w-0 gap-0 border border-olive-600 lg:grid-cols-2">
         <DossierPanel label={`Difficulté ${exercise.difficulty}/3`} title={exercise.title}>
           <p>{exercise.briefing}</p>
           <ul className="list-inside list-disc space-y-1 text-sm">
@@ -170,13 +180,13 @@ export function ChallengeScreen({
               <li key={c}>{c}</li>
             ))}
           </ul>
-          <div className="border border-paper-300 bg-paper-100 p-3 font-mono text-xs">
+          <div className="min-w-0 overflow-x-auto border border-paper-300 bg-paper-100 p-3 font-mono text-xs">
             <p className="whitespace-pre-wrap">{exercise.example.input}</p>
             <p className="mt-2 text-paper-ink/60">→ {exercise.example.output}</p>
           </div>
         </DossierPanel>
 
-        <div className="flex h-80 flex-col lg:h-auto">
+        <div className="flex h-80 min-w-0 flex-col lg:h-auto">
           <CodeEditor
             label={`def ${exercise.functionName}(...)`}
             value={code}
@@ -212,6 +222,22 @@ export function ChallengeScreen({
           </button>
         )}
       </div>
+
+      {loadError && (
+        <div role="alert" className="border-2 border-signal-danger-strong bg-bunker-900 p-4">
+          <p className="font-display text-base font-semibold text-signal-danger-strong">
+            Impossible de lancer la mission
+          </p>
+          <p className="mt-1 text-sm text-paper-300">{loadError}</p>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            className="mt-3 border border-signal-danger-strong px-3 py-1.5 font-mono text-xs text-signal-danger-strong hover:bg-signal-danger-strong hover:text-bunker-950"
+          >
+            Réessayer
+          </button>
+        </div>
+      )}
 
       {report && (
         <AfterActionReport report={report} xpAwarded={xpAwarded} exercise={exercise} code={code} />
@@ -286,6 +312,7 @@ function AfterActionReport({
               rightTitle="Ta sortie"
               useDarkTheme
               splitView
+              styles={diffViewerStyles}
             />
           </div>
           <div className="mt-3">

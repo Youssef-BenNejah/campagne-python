@@ -20,12 +20,17 @@ export function HintsPanel({ exercise, code }: { exercise: Exercise; code: strin
     setLoading(true);
     const lines: string[] = [];
     if (exercise.expectsLoop !== false) {
-      const hasLoop = await hasLoopOrComprehension(code);
-      if (!hasLoop) {
-        lines.push(
-          "Ton code ne contient ni boucle (for/while) ni liste en compréhension — " +
-            "cet exercice s'y prête naturellement, regarde si tu n'en as pas besoin.",
-        );
+      try {
+        const hasLoop = await hasLoopOrComprehension(code);
+        if (!hasLoop) {
+          lines.push(
+            "Ton code ne contient ni boucle (for/while) ni liste en compréhension — " +
+              "cet exercice s'y prête naturellement, regarde si tu n'en as pas besoin.",
+          );
+        }
+      } catch {
+        // The structural check needs Pyodide; if it can't load, skip the
+        // nudge rather than blocking the (more important) constraints hint.
       }
     }
     lines.push(`Relis bien les contraintes : ${exercise.constraints.join(" · ")}`);
