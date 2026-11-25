@@ -76,18 +76,59 @@ export interface Rank {
   id: string;
   name: string;
   minXp: number;
+  tagline: string;
 }
 
 /** The campaign ladder: rank unlocks at cumulative XP thresholds. */
 export const ranks: Rank[] = [
-  { id: "recrue", name: "Recrue", minXp: 0 },
-  { id: "soldat", name: "Soldat", minXp: 200 },
-  { id: "caporal", name: "Caporal", minXp: 500 },
-  { id: "sergent", name: "Sergent", minXp: 900 },
-  { id: "lieutenant", name: "Lieutenant", minXp: 1400 },
-  { id: "capitaine", name: "Capitaine", minXp: 2000 },
-  { id: "commandant", name: "Commandant", minXp: 2700 },
-  { id: "colonel", name: "Colonel", minXp: 3500 },
+  {
+    id: "recrue",
+    name: "Recrue",
+    minXp: 0,
+    tagline: "Tu viens de rejoindre la campagne. Chaque ligne de code est un premier pas.",
+  },
+  {
+    id: "soldat",
+    name: "Soldat",
+    minXp: 200,
+    tagline: "Les bases sont acquises. Direction les premiers avant-postes sérieux.",
+  },
+  {
+    id: "caporal",
+    name: "Caporal",
+    minXp: 500,
+    tagline: "Tu enchaînes les victoires sans trop d'hésitation.",
+  },
+  {
+    id: "sergent",
+    name: "Sergent",
+    minXp: 900,
+    tagline: "Les boucles et les tableaux n'ont plus de secret pour toi.",
+  },
+  {
+    id: "lieutenant",
+    name: "Lieutenant",
+    minXp: 1400,
+    tagline: "Tu es prêt à affronter des problèmes qui combinent plusieurs notions.",
+  },
+  {
+    id: "capitaine",
+    name: "Capitaine",
+    minXp: 2000,
+    tagline: "Un vétéran des fronts. Peu de pièges t'arrêtent encore.",
+  },
+  {
+    id: "commandant",
+    name: "Commandant",
+    minXp: 2700,
+    tagline: "Tu diriges la stratégie : plus grand-chose ne te résiste.",
+  },
+  {
+    id: "colonel",
+    name: "Colonel",
+    minXp: 3500,
+    tagline: "Le sommet de la campagne. Tu maîtrises l'algorithmique du programme.",
+  },
 ];
 
 export function rankForXp(xp: number): Rank {

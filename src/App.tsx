@@ -4,6 +4,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Battle } from "./pages/Battle";
 import { CampaignMap } from "./pages/CampaignMap";
 import { Course } from "./pages/Course";
+import { Grades } from "./pages/Grades";
 import { Journal } from "./pages/Journal";
 import { Login } from "./pages/Login";
 import { Mentor } from "./pages/Mentor";
@@ -20,6 +21,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <CampaignMap />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/grades"
+          element={
+            <ProtectedRoute>
+              <Grades />
             </ProtectedRoute>
           }
         />
