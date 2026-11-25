@@ -58,4 +58,67 @@ export const rechercheExercises: Exercise[] = [
       return [t, x];
     },
   },
+  {
+    id: "recherche-sequentielle-bool",
+    topicId: "recherche",
+    title: "Présent ou absent ?",
+    difficulty: 1,
+    sourceNote: "Adapté de 02_recherche.md — fonction RechSeq",
+    briefing:
+      "t n'est pas forcément trié. Écris la fonction est_present(t, x) qui " +
+      "parcourt t et renvoie True si x s'y trouve, False sinon.",
+    constraints: ["1 ≤ len(t) ≤ 30"],
+    example: { input: "t = [4, 9, 2, 7], x = 2", output: "True" },
+    functionName: "est_present",
+    starterCode: `def est_present(t, x):
+    # Renvoie True si x est dans t, False sinon.
+    pass
+`,
+    referenceSolution: `def est_present(t, x):
+    for valeur in t:
+        if valeur == x:
+            return True
+    return False
+`,
+    fixedCases: [
+      { description: "Présent", args: [[4, 9, 2, 7], 2] },
+      { description: "Absent", args: [[4, 9, 2, 7], 5] },
+    ],
+    randomCase: () => {
+      const n = randomInt(3, 12);
+      const t = Array.from({ length: n }, () => randomInt(1, 50));
+      const x = Math.random() < 0.5 ? t[randomInt(0, n - 1)] : randomInt(51, 100);
+      return [t, x];
+    },
+  },
+  {
+    id: "recherche-sequentielle-position",
+    topicId: "recherche",
+    title: "À quel rang ?",
+    difficulty: 1,
+    sourceNote: "Adapté de 02_recherche.md — IV, correction « rechercher »",
+    briefing:
+      "t n'est pas forcément trié. Écris la fonction position(t, x) qui renvoie " +
+      "l'indice de la première occurrence de x dans t, ou -1 si x est absent.",
+    constraints: ["1 ≤ len(t) ≤ 30"],
+    example: { input: "t = [4, 9, 2, 7], x = 7", output: "3" },
+    functionName: "position",
+    starterCode: `def position(t, x):
+    # Renvoie l'indice de x dans t, ou -1 si absent.
+    pass
+`,
+    referenceSolution: `def position(t, x):
+    for i in range(len(t)):
+        if t[i] == x:
+            return i
+    return -1
+`,
+    fixedCases: [{ description: "Exemple", args: [[4, 9, 2, 7], 7] }],
+    randomCase: () => {
+      const n = randomInt(3, 12);
+      const t = Array.from({ length: n }, () => randomInt(1, 50));
+      const x = Math.random() < 0.5 ? t[randomInt(0, n - 1)] : randomInt(51, 100);
+      return [t, x];
+    },
+  },
 ];

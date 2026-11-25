@@ -11,8 +11,8 @@ declare global {
 }
 
 export interface PyodideInterface {
-  runPython: (code: string) => unknown;
-  runPythonAsync: (code: string) => Promise<unknown>;
+  runPython: (code: string, options?: { globals: unknown }) => unknown;
+  runPythonAsync: (code: string, options?: { globals: unknown }) => Promise<unknown>;
   globals: {
     get: (name: string) => unknown;
     set: (name: string, value: unknown) => void;
